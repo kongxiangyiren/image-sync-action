@@ -1,0 +1,24 @@
+name: Docker sync images
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   # every day at 7am & 7pm pacific
+  #   - cron: "0 2,14 * * *"
+
+jobs:
+  sync-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - uses: hhyasdf/image-sync-action@v1.1
+        with:
+          auth_file: ./auth.json
+          images_file: ./images.json
+          version: latest
+          proc: 5
+          arch: arm64
+          retries: 3
+        env:
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
