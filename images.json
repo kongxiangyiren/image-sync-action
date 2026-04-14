@@ -1,3 +1,4 @@
 {
-  "nginx:alpine": "crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/nginx:alpine"
+  "nginx:alpine": "crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/nginx:alpine",
+  "rocm/pytorch:latest":"crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/pytorch:latest"
 }
