@@ -1,5 +1,3 @@
 {
-  "nginx:alpine": "crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/nginx:alpine",
-  "rocm/pytorch:latest":"crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/pytorch:latest",
-  "ghcr.io/kekxv/gitea-copilot:latest":"crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren/gitea-copilot:latest"
+  "rocm/pytorch:latest":"ccr.ccs.tencentyun.com/kxyr/pytorch:latest"
 }
