@@ -1,0 +1,9 @@
+crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com/kongxiangyiren:
+  username: 空巷一人
+  password: ${ACR_PASSWORD}
+  insecure: false
+
+ccr.ccs.tencentyun.com/kxyr:
+  username: 100017379911
+  password: ${ACR_PASSWORD}
+  insecure: false
