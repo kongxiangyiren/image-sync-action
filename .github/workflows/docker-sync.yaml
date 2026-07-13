@@ -3,8 +3,21 @@ name: Docker sync images
 on:
   workflow_dispatch:
   schedule:
-  #   # every day at 7am & 7pm pacific
-    - cron: "0 2,14 * * *"
+    #   # every day at 7am & 7pm pacific
+    - cron: '0 2,14 * * *'
+  push:
+    branches:
+      - main
+    paths-ignore: # 这里表示忽略的文件或目录，不会触发流程
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.vscode/**'
+      - '.test/**'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - '.github/**'
+      - 'auth.yaml'
 
 jobs:
   sync-images:
