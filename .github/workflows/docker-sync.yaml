@@ -3,7 +3,7 @@ name: Docker sync images
 on:
   workflow_dispatch:
   schedule:
-    #   # every day at 7am & 7pm pacific
+    # 每天 UTC 02:00 / 14:00（北京时间 10:00 / 22:00）
     - cron: '0 2,14 * * *'
   push:
     branches:
@@ -16,22 +16,90 @@ on:
       - '.test/**'
       - '.dockerignore'
       - 'Dockerfile'
-      - '.github/**'
-      - 'auth.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docker-sync
+  cancel-in-progress: false
+
+env:
+  # 拉取/推送失败时的重试次数
+  RETRIES: 3
+  # 目标仓库：registry + namespace
+  ALIYUN_REGISTRY: crpi-wf8smalfmxsqrm3t.cn-hangzhou.personal.cr.aliyuncs.com
+  ALIYUN_NAMESPACE: kxyr
+  ALIYUN_USERNAME: 空巷一人
 
 jobs:
-  sync-images:
+  sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # source: 源镜像（省略 tag 时默认 latest）
+          # target: 目标镜像名（省略时沿用源镜像名与 tag）
+          - source: jxxghp/moviepilot-v3:3.2.5
+            target: moviepilot-v3:3.2.5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - uses: hhyasdf/image-sync-action@v1.1
+      - name: Login to Aliyun Container Registry
+        uses: docker/login-action@v4
         with:
-          auth_file: ./auth.yaml
-          images_file: ./images.yaml
-          version: latest
-          proc: 5
-          # arch: arm64
-          retries: 3
+          registry: ${{ env.ALIYUN_REGISTRY }}
+          username: ${{ env.ALIYUN_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Sync ${{ matrix.source }}
         env:
-          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+          SOURCE: ${{ matrix.source }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+
+          has_tag() {
+            local last="${1##*/}"
+            [[ "$last" == *:* ]]
+          }
+
+          retry() {
+            local n=0
+            until "$@"; do
+              n=$((n + 1))
+              if [ "$n" -ge "$RETRIES" ]; then
+                echo "::error::失败（已重试 $RETRIES 次）: $*"
+                return 1
+              fi
+              echo "第 $n 次失败，5 秒后重试: $*"
+              sleep 5
+            done
+          }
+
+          src="$SOURCE"
+          has_tag "$src" || src="$src:latest"
+
+          dst="${TARGET:-}"
+          if [ -z "$dst" ]; then
+            dst="${src##*/}"
+          fi
+          has_tag "$dst" || dst="$dst:latest"
+
+          echo "源镜像: $src"
+          echo "目标镜像: $dst"
+
+          retry docker pull "$src"
+
+          ref="$ALIYUN_REGISTRY/$ALIYUN_NAMESPACE/$dst"
+          echo "推送: $ref"
+          docker tag "$src" "$ref"
+          retry docker push "$ref"
+
+          {
+            echo "### 同步完成"
+            echo ""
+            echo "- 源镜像: \`$src\`"
+            echo "- 目标镜像: \`$ref\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
