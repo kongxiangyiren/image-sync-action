@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # 每天 UTC 02:00 / 14:00（北京时间 10:00 / 22:00）
-    - cron: '0 2,14 * * *'
+    # - cron: '0 2,14 * * *'
   push:
     branches:
       - main
