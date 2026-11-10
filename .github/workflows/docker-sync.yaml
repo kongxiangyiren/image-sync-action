@@ -2,7 +2,7 @@ name: Docker sync images
 
 on:
   workflow_dispatch:
-  schedule:
+  # schedule:
     # 每天 UTC 02:00 / 14:00（北京时间 10:00 / 22:00）
     # - cron: '0 2,14 * * *'
   push:
@@ -44,6 +44,8 @@ jobs:
           # target: 目标镜像名（省略时沿用源镜像名与 tag）
           - source: jxxghp/moviepilot-v3:3.2.5
             target: moviepilot-v3:3.2.5
+          - source: jellyfin/jellyfin:10.11.11
+            target: jellyfin:10.11.11
     steps:
       - name: Login to Aliyun Container Registry
         uses: docker/login-action@v4
